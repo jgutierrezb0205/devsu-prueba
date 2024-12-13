@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Servicios para las aplicaciones Spring Boot
+  
+  microservicio-2:
+    build:
+      context: ./account
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=prueba;encrypt=false;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=P@ssw0rd2024
+      - SPRING_DATASOURCE_DRIVER_CLASSNAME=com.microsoft.sqlserver.jdbc.SQLServerDriver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+    depends_on:
+      - db
+    networks:
+      - app-network
+  
+  microservicio-1:
+    build:
+      context: ./prueba
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=prueba;encrypt=false;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=P@ssw0rd2024
+      - SPRING_DATASOURCE_DRIVER_CLASSNAME=com.microsoft.sqlserver.jdbc.SQLServerDriver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+      - client.account.baseUrl=http://microservicio-2:8081/api/v1
+      - client.account.movements.path=/movements
+    depends_on:
+      - db
+      - microservicio-2
+    networks:
+      - app-network
+
+  # Servicio para la base de datos SQL Server
+  db:
+    image: mcr.microsoft.com/mssql/server
+    container_name: sql-server-container
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=P@ssw0rd2024
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+# Volumen persistente para la base de datos
+volumes:
+  sql-data:
+    driver: local
