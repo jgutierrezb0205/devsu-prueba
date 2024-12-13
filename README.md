@@ -1,7 +1,7 @@
 # devsu-prueba
 
-1. Clonar el repositorio en una ruta de su prederencia.
-2. Abrir y compilar los proyectos (prueba, account) en su ID de preferencia.
+1. Clonar el repositorio en una ruta de su preferencia.
+2. Abrir y compilar los proyectos (prueba, account) en su IDE de preferencia.
 3. Verificar que los proyectos se hayan compilado sin errores, esto para asegurarnos que los jar se han generado de forma satisfactoria.
 4. abrir una ventana de comandos "CMD", en la ruta origen del repositorio, donde se encuentra localizado el archivo "docker-compose".
 5. ejecutar en la ventana de comandos: docker-compose up --build
