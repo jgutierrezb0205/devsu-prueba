@@ -3,6 +3,7 @@ package com.devsu.prueba.controller;
 import com.devsu.prueba.service.MovementService;
 import com.devsu.prueba.service.dto.GetMovementDto;
 import com.devsu.prueba.service.dto.PostMovementDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +26,11 @@ public class MovementController {
         return new ResponseEntity<>(movementService.postMovement(postMovementDto), HttpStatus.CREATED);
     }
 
-    @GetMapping()
+    @GetMapping("/{clientId}")
     public ResponseEntity<Flux<GetMovementDto>> getMovements(
+            @PathVariable(name = "clientId") UUID clientId,
             @RequestParam(name = "init_date", required = true) LocalDateTime initDate,
-            @RequestParam(name = "end_date", required = true) LocalDateTime endDate,
-            @RequestParam(name = "client_id", required = true) UUID clientId
+            @RequestParam(name = "end_date", required = true) LocalDateTime endDate
     ) {
         return ResponseEntity.ok(movementService.getMovementsByDateAndClientId(
                 initDate,

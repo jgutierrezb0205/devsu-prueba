@@ -61,10 +61,12 @@ class ClientServiceImplTest {
     }
 
     @Test
+    @DisplayName("Given no clients When getClients is called Then return empty flux")
     void givenNoClients_whenGetClients_thenReturnEmptyFlux() {
-
+        // Arrange
         when(clientRepository.findAll()).thenReturn(Collections.emptyList());
 
+        // Act & Assert
         StepVerifier.create(clientService.getClients())
                 .verifyComplete();
 
@@ -99,5 +101,18 @@ class ClientServiceImplTest {
         getClientDto.setPassword("password");
         getClientDto.setGender(Gender.MALE);
         return getClientDto;
+    }
+
+    private static Client generateClient() {
+        Client client = new Client();
+        client.setId(UUID.randomUUID());
+        client.setStatus(Status.ACTIVATE);
+        client.setAddress("Address Test");
+        client.setName("Juan Perez");
+        client.setIdentification("0987654321");
+        client.setPhone("0909090909");
+        client.setPassword("password");
+        client.setGender(Gender.MALE);
+        return client;
     }
 }

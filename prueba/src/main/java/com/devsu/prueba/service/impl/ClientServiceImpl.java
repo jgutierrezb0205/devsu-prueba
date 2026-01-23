@@ -26,7 +26,6 @@ public class ClientServiceImpl implements ClientService {
 
     public Flux<GetClientDto> getClients() {
         return Flux.fromIterable(clientRepository.findAll())
-                .switchIfEmpty(Mono.error(new DevsuNotFoundException("Not found clients")))
                 .map(clientMapper::toGetClientDto);
     }
 

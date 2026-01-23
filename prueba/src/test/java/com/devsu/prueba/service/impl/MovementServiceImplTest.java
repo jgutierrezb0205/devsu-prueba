@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ class MovementServiceImplTest {
     void givenValidMovementData_whenPostMovement_thenSaveSuccessfully() {
         
         UUID accountId = UUID.randomUUID();
-        PostMovementDto postMovementDto = generatePostMovementDto(accountId, MovementType.CREDIT, 100.0);
+        PostMovementDto postMovementDto = generatePostMovementDto(accountId, MovementType.CREDIT, new BigDecimal("100.0"));
         
         when(webClientAccount.postMovement(any(PostMovementDto.class)))
                 .thenReturn(Mono.empty());
@@ -47,7 +48,7 @@ class MovementServiceImplTest {
     void givenWebclientError_whenPostMovement_thenPropagateError() {
         
         UUID accountId = UUID.randomUUID();
-        PostMovementDto postMovementDto = generatePostMovementDto(accountId, MovementType.CREDIT, 100.0);
+        PostMovementDto postMovementDto = generatePostMovementDto(accountId, MovementType.CREDIT, new BigDecimal("100.0"));
         RuntimeException expectedException = new RuntimeException("WebClient communication error");
         
         when(webClientAccount.postMovement(any(PostMovementDto.class)))
@@ -62,7 +63,7 @@ class MovementServiceImplTest {
         verify(webClientAccount, times(1)).postMovement(any(PostMovementDto.class));
     }
 
-    private static PostMovementDto generatePostMovementDto(UUID accountId, MovementType movementType, double value) {
+    private static PostMovementDto generatePostMovementDto(UUID accountId, MovementType movementType, BigDecimal value) {
         PostMovementDto postMovementDto = new PostMovementDto();
         postMovementDto.setMovementType(movementType);
         postMovementDto.setDate(LocalDateTime.of(2024, 12, 12, 8, 0, 0));

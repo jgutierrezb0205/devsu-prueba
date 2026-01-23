@@ -1,6 +1,5 @@
 package com.devsu.prueba.entities;
 
-import com.devsu.prueba.account.entities.Movement;
 import com.devsu.prueba.entities.enums.AccountType;
 import com.devsu.prueba.entities.enums.Status;
 import jakarta.persistence.*;

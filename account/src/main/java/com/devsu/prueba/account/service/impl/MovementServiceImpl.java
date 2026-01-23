@@ -54,7 +54,7 @@ public class MovementServiceImpl implements MovementService {
                     }
                     
                     // Actualizar el balance de la cuenta
-                    account.setBalance(newBalance.doubleValue());
+                    account.setBalance(newBalance);
                     accountRepository.save(account);
 
                     // Crear el movimiento
@@ -62,7 +62,7 @@ public class MovementServiceImpl implements MovementService {
                     movement.setMovementType(postMovementDto.getMovementType());
                     movement.setDate(postMovementDto.getDate());
                     movement.setValue(postMovementDto.getValue());
-                    movement.setBalance(newBalance.doubleValue());
+                    movement.setBalance(newBalance);
                     movement.setAccount(account);
 
                     movementRepository.save(movement);

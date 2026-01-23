@@ -4,6 +4,7 @@ import com.devsu.prueba.service.AccountService;
 import com.devsu.prueba.service.dto.GetAccountDto;
 import com.devsu.prueba.service.dto.PostAccountDto;
 import com.devsu.prueba.service.dto.PutAccountDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
