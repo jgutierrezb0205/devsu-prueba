@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,8 +19,8 @@ public class GetMovementDto {
     private String client;
     private String numberAccount;
     private AccountType accountType;
-    private float initialBalance;
+    private BigDecimal initialBalance;
     private Status status;
-    private float movement;
-    private float availableBalance;
+    private BigDecimal movement;
+    private BigDecimal availableBalance;
 }

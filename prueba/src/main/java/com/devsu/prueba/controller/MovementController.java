@@ -21,7 +21,7 @@ public class MovementController {
     private final MovementService movementService;
 
     @PostMapping
-    public ResponseEntity<Mono<Void>> postMovement(@RequestBody PostMovementDto postMovementDto) {
+    public ResponseEntity<Mono<Void>> postMovement(@Valid @RequestBody PostMovementDto postMovementDto) {
         return new ResponseEntity<>(movementService.postMovement(postMovementDto), HttpStatus.CREATED);
     }
 

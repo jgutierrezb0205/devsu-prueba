@@ -31,7 +31,7 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<Mono<Void>> postAccount(@RequestBody PostAccountDto postAccountDto) {
+    public ResponseEntity<Mono<Void>> postAccount(@Valid @RequestBody PostAccountDto postAccountDto) {
         return new ResponseEntity<>(accountService.postAccount(postAccountDto), HttpStatus.CREATED);
     }
 

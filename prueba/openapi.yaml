@@ -233,7 +233,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /api/v1/movements:
+  /api/v1/movements/{clientId}:
     get:
       tags:
         - Movements
@@ -241,6 +241,13 @@ paths:
       description: Retorna una lista de movimientos filtrados por rango de fechas y cliente
       operationId: getMovements
       parameters:
+        - name: clientId
+          in: path
+          required: true
+          description: Identificador único del cliente
+          schema:
+            type: string
+            format: uuid
         - name: init_date
           in: query
           required: true
@@ -257,13 +264,6 @@ paths:
             type: string
             format: date-time
           example: "2026-01-31T23:59:59"
-        - name: client_id
-          in: query
-          required: true
-          description: Identificador único del cliente
-          schema:
-            type: string
-            format: uuid
       responses:
         '200':
           description: Lista de movimientos obtenida exitosamente
@@ -279,6 +279,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements:
     post:
       tags:
         - Movements

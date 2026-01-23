@@ -1,5 +1,7 @@
 package com.devsu.prueba.service.dto;
 
+import java.math.BigDecimal;
+
 import com.devsu.prueba.entities.enums.AccountType;
 import com.devsu.prueba.entities.enums.Status;
 import lombok.AllArgsConstructor;
@@ -14,7 +16,7 @@ import lombok.Setter;
 public class PutAccountDto {
     private String number;
     private AccountType accountType;
-    private float initialBalance;
-    private float balance;
+    private BigDecimal initialBalance;
+    private BigDecimal balance;
     private Status status;
 }

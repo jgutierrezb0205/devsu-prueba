@@ -5,6 +5,7 @@ import com.devsu.prueba.account.entities.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,9 +25,9 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    private float initialBalance;
+    private BigDecimal initialBalance;
 
-    private float balance;
+    private BigDecimal balance;
 
     @NonNull
     @Enumerated(EnumType.STRING)

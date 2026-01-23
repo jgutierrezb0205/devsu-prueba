@@ -40,7 +40,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<Void>> putClient(@PathVariable UUID id, @RequestBody PutClientDto putClientDto) {
+    public ResponseEntity<Mono<Void>> putClient(@PathVariable UUID id, @Valid @RequestBody PutClientDto putClientDto) {
         return new ResponseEntity<>(clientService.putClient(putClientDto, id), HttpStatus.NO_CONTENT);
     }
 

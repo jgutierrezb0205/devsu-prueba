@@ -1,65 +1,100 @@
 version: '3.8'
 
 services:
-  # Servicios para las aplicaciones Spring Boot
-  
+  # Base de datos SQL Server
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql-server-container
+    environment:
+      - ACCEPT_EULA=${ACCEPT_EULA}
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=${MSSQL_PID}
+    ports:
+      - "${DB_PORT}:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./init-db.sh:/init-db.sh
+    networks:
+      - app-network
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "/opt/mssql-tools/bin/sqlcmd -S localhost -U ${DB_USERNAME} -P ${DB_PASSWORD} -Q 'SELECT 1' || exit 1"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    command: >
+      bash -c '
+      /opt/mssql/bin/sqlservr &
+      sleep 30
+      /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = ''${DB_NAME}'') CREATE DATABASE ${DB_NAME}"
+      /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -d ${DB_NAME} -i /docker-entrypoint-initdb.d/schema.sql
+      wait
+      '
+
+  # Microservicio 2 - Account Service
   microservicio-2:
     build:
       context: ./account
       dockerfile: Dockerfile
+    container_name: account-service
     ports:
       - "8081:8081"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=prueba;encrypt=false;trustServerCertificate=true
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=P@ssw0rd2024
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://${DB_HOST}:1433;databaseName=${DB_NAME};encrypt=false;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_DATASOURCE_DRIVER_CLASSNAME=com.microsoft.sqlserver.jdbc.SQLServerDriver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app-network
-  
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: on-failure
+
+  # Microservicio 1 - Main Service
   microservicio-1:
     build:
       context: ./prueba
       dockerfile: Dockerfile
+    container_name: main-service
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=prueba;encrypt=false;trustServerCertificate=true
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=P@ssw0rd2024
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://${DB_HOST}:1433;databaseName=${DB_NAME};encrypt=false;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_DATASOURCE_DRIVER_CLASSNAME=com.microsoft.sqlserver.jdbc.SQLServerDriver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
-      - client.account.baseUrl=http://microservicio-2:8081/api/v1
-      - client.account.movements.path=/movements
+      - CLIENT_ACCOUNT_BASEURL=${ACCOUNT_SERVICE_URL}
+      - CLIENT_ACCOUNT_MOVEMENTS_PATH=${MOVEMENTS_PATH}
     depends_on:
-      - db
-      - microservicio-2
+      db:
+        condition: service_healthy
+      microservicio-2:
+        condition: service_healthy
     networks:
       - app-network
-
-  # Servicio para la base de datos SQL Server
-  db:
-    image: mcr.microsoft.com/mssql/server
-    container_name: sql-server-container
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=P@ssw0rd2024
-      - MSSQL_PID=Developer
-    ports:
-      - "1433:1433"
-    volumes:
-      - sql-data:/var/opt/mssql
-    networks:
-      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: on-failure
 
 networks:
   app-network:
     driver: bridge
 
-# Volumen persistente para la base de datos
 volumes:
   sql-data:
     driver: local

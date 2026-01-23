@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -18,7 +19,7 @@ public class PostAccountDto {
     private UUID clientId;
     private String number;
     private AccountType accountType;
-    private float initialBalance;
-    private float balance;
+    private BigDecimal initialBalance;
+    private BigDecimal balance;
     private Status status;
 }

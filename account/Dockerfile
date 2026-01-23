@@ -1,12 +1,36 @@
-FROM openjdk:17-jdk-slim as build
+# Etapa 1: Build
+FROM gradle:8.5-jdk17 AS build
+
+WORKDIR /app
+
+# Copiar archivos de configuración de Gradle
+COPY build.gradle settings.gradle ./
+COPY gradle ./gradle
+COPY gradlew ./
+
+# Descargar dependencias (se cachea si no cambian)
+RUN gradle dependencies --no-daemon || true
+
+# Copiar código fuente
+COPY src ./src
+
+# Compilar la aplicación
+RUN gradle build -x test --no-daemon
+
+# Etapa 2: Runtime
+FROM eclipse-temurin:17-jre-alpine
+
 LABEL authors="Jordan"
 
 WORKDIR /app
 
-COPY build/libs/account-1.0.0.jar account-1.0.0.jar
+# Copiar el JAR compilado desde la etapa de build
+COPY --from=build /app/build/libs/account-1.0.0.jar app.jar
 
-# Exponemos el puerto en el que se ejecuta la aplicación (por defecto es el 8080)
+# Crear usuario no-root para seguridad
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
 EXPOSE 8081
 
-# Comando para ejecutar el JAR de la aplicación
-ENTRYPOINT ["java", "-jar", "/app/account-1.0.0.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -4,6 +4,7 @@ import com.devsu.prueba.entities.enums.AccountType;
 import com.devsu.prueba.entities.enums.Status;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -14,7 +15,7 @@ public class GetAccountDto {
     private UUID id;
     private String number;
     private AccountType accountType;
-    private float initialBalance;
-    private float balance;
+    private BigDecimal initialBalance;
+    private BigDecimal balance;
     private Status status;
 }
